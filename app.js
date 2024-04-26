@@ -1,6 +1,6 @@
 import { createServer } from 'http';
 import { readFile } from 'fs';
-import { obtenerUsuarios, exportarUsuariosCSV, importarUsuariosCSV } from './controller.js';
+import { obtenerUsuarios, exportarUsuariosCSV, importarUsuariosCSV } from './src/controller.js';
 
 const PORT = process.env.PORT || 3000;
 
