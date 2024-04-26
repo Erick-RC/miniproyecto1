@@ -1,12 +1,12 @@
-const http = require('http');
-const fs = require('fs');
-const controller = require('./controller' );
+import { createServer } from 'http';
+import { readFile } from 'fs';
+import { obtenerUsuarios, exportarUsuariosCSV, importarUsuariosCSV } from './controller.js';
 
 const PORT = process.env.PORT || 3000;
 
-const server = http.createServer(async (req, res) => {
+const server = createServer(async (req, res) => {
   if (req.url === '/' && req.method === 'GET') {
-    fs.readFile('./public/index.html', (err, data) => {
+    readFile('./public/index.html', (err, data) => {
       if (err) {
         res.writeHead(500, { 'Content-Type': 'text/plain'});
         res.end('Error interno del servidor');
@@ -16,11 +16,11 @@ const server = http.createServer(async (req, res) => {
       }
     });
   } else if (req.url === '/api/usuarios' && req.method === 'GET') {
-    controller.obtenerUsuarios(req, res);
+    obtenerUsuarios(req, res);
   } else if (req.url === '/api/usuarios/export' && req.method === 'GET') {
-    controller.exportarUsuariosCSV(req, res);
+    exportarUsuariosCSV(req, res);
   } else if (req.url === '/api/usuarios/import' && req.method === 'POST') {
-    controller.importarUsuariosCSV(req, res);
+    importarUsuariosCSV(req, res);
   } else {
     res.writeHead(404, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ message: 'Ruta no encontrada' }));

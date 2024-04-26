@@ -1,7 +1,8 @@
-const fs = require('fs');
-const Usuario = require('./model');
-const dotenv = require('dotenv');
-dotenv.config();
+import { writeFileSync } from 'fs';  // Importa la función writeFileSync de fs
+import Usuario from './model.js'; // Asegúrate de usar la extensión .js en la importación
+import { createReadStream } from 'fs'; // Importa la función createReadStream de fs
+import { config } from 'dotenv';
+config();
 
 const PORT = process.env.PORT || 3000;
 
@@ -28,7 +29,7 @@ async function exportarUsuariosCSV(req, res) {
       csvContent += `${usuario.id},${usuario.nombres},${usuario.apellidos},${usuario.direccion},${usuario.correo},${usuario.dni},${usuario.edad},${usuario.fecha_creacion},${usuario.telefono}\n`;
     });
 
-    fs.writeFileSync('usuarios.csv', csvContent);
+    writeFileSync('usuarios.csv', csvContent);
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ message: 'Datos exportados a usuarios.csv' }));
@@ -41,19 +42,18 @@ async function exportarUsuariosCSV(req, res) {
 
 async function importarUsuariosCSV(req, res) {
   try {
-    const inputStream = fs.createReadStream('usuarios.csv');
-    const rl = require('readline').createInterface({
-      input: inputStream,
-      crlfDelay: Infinity
+    const inputStream = createReadStream('usuarios.csv');
+    const rl = inputStream.pipe(require('stream').Transform({ objectMode: true }));
+
+    rl.on('data', function (data) {
+      const userData = data.toString().split(',');
+      console.log(userData);
     });
 
-    for await (const line of rl) {
-      const data = line.split(',');
-      console.log(data);
-    }
-
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ message: 'Datos importados exitosamente' }));
+    rl.on('end', function () {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ message: 'Datos importados exitosamente' }));
+    });
   } catch (error) {
     console.error('Error al importar usuarios:', error);
     res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -61,4 +61,4 @@ async function importarUsuariosCSV(req, res) {
   }
 }
 
-module.exports = { obtenerUsuarios, exportarUsuariosCSV, importarUsuariosCSV };
+export { obtenerUsuarios, exportarUsuariosCSV, importarUsuariosCSV };

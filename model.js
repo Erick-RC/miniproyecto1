@@ -1,4 +1,4 @@
-const db = require('./db');
+import db from './db.js';
 
 async function obtenerUsuarios() {
   const connection = await db.getConnection();
@@ -12,4 +12,4 @@ async function obtenerUsuarios() {
   }
 }
 
-module.exports = { obtenerUsuarios };
+export default { obtenerUsuarios };
